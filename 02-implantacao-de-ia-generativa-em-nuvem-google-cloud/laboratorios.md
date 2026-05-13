@@ -1,7 +1,5 @@
 # Anotações dos Laboratórios
 
----
-
 ## Laboratório 1: Reduzir o Viés com o MinDiff no TensorFlow
 
 ### Visão Geral e Propósito do Laboratório
@@ -38,4 +36,6 @@ Com o ambiente em nuvem pronto, a fase de programação em si se inicia através
 - **Navegação e Limpeza:** O usuário deve localizar o notebook específico da solução (min_diff_keras.ipynb dentro da pasta responsible_ai/fairness/solutions). Uma prática recomendada antes de iniciar é limpar todas as saídas de código pré-existentes na interface para garantir uma execução limpa.
 - **Execução Célula a Célula:** Por fim, o aluno executa o notebook interativo (utilizando SHIFT+ENTER), lendo as instruções de cada bloco de código para compreender passo a passo como o TensorFlow Model Remediation treina e ajusta os pesos do modelo para atingir a imparcialidade desejada.
 
-- ---
+---
+
+## Laboratório 2: 
