@@ -1,8 +1,8 @@
-# Laboratórios
+# Anotações dos Laboratórios
 
 ---
 
-## Reduzir o Viés com o MinDiff no TensorFlow
+## Laboratório 1: Reduzir o Viés com o MinDiff no TensorFlow
 
 ### Visão Geral e Propósito do Laboratório
 
