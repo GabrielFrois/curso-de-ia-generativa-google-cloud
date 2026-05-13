@@ -136,7 +136,7 @@ O trabalho não acaba quando o modelo vai para produção; na verdade, ele apena
 
 ## Estudo de caso: Google Voos
 
-### Visão Geral: O Problema da Compra de Passagens
+### O Problema da Compra de Passagens
 
 Comprar passagens aéreas é frequentemente uma experiência estressante. Os preços flutuam constantemente, os padrões são difíceis de identificar e a falta de transparência gera insegurança no consumidor.  
 
@@ -286,7 +286,7 @@ Usando o esquema definido, o TFDV verifica de forma autônoma se os novos dados 
 
 ## Identificar o Viés: Ferramenta What-If
 
-### Visão Geral: O Poder do "E se...?"
+### O Poder do "E se...?"
 
 A Ferramenta What-If (What-If Tool) do Google é uma plataforma interativa criada para analisar visualmente como conjuntos de dados e modelos de Machine Learning interagem. Seu principal objetivo é ajudar desenvolvedores a investigar o comportamento do modelo, entender suas vulnerabilidades e garantir a imparcialidade, permitindo explorar cenários hipotéticos sem precisar escrever código adicional.  
 
@@ -317,7 +317,7 @@ Enquanto a guia anterior foca no micro (pontos individuais), esta guia foca no m
 
 ## Identificar o Viés: Ferramenta TensorFlow Model Analysis (TFMA)
 
-### Visão Geral: O Que é o TFMA?
+### O Que é o TFMA?
 
 A TensorFlow Model Analysis (TFMA) é uma biblioteca avançada projetada para dissecar e analisar o desempenho de modelos de Machine Learning sob múltiplas perspectivas, com um forte foco em métricas de imparcialidade (fairness).
 - Compatibilidade e Extensibilidade: Embora o TFMA tenha sido construído como uma ferramenta nativa para dar suporte aos modelos do ecossistema TensorFlow, ele é altamente flexível. Sua arquitetura permite que ele seja estendido para analisar resultados de outros frameworks populares do mercado, como modelos do scikit-learn ou até mesmo dados tabulares usando DataFrames do Pandas.
@@ -351,4 +351,39 @@ Para investigações ainda mais profundas sobre vieses éticos, o resultado da a
 
 ---
 
-##
+## Reduzir o viés: intervenção de dados
+
+### A Importância dos Dados de Treinamento
+
+Para mitigar vieses em sistemas de Inteligência Artificial, a primeira frente de batalha ocorre nos dados. 
+Se os dados contiverem lacunas, representação excessiva de um grupo ou falta de dados para subgrupos específicos, o modelo fatalmente apresentará diferenças drásticas de desempenho.  
+
+Para melhorar a qualidade e a diversidade do treinamento, as equipes devem focar em quatro objetivos fundamentais:
+1. **Representação Suficiente:** Todos os grupos devem estar presentes em volume adequado.
+2. **Limpeza de Rótulos Nocivos:** Remover mídias ou classificações pejorativas e de baixa qualidade.
+3. **Combate a Estereótipos:** Evitar dados distorcidos que ensinem correlações falsas e prejudiciais ao modelo.
+4. **Auditoria de Autoria:** Garantir que quem coletou, descreveu ou anotou os dados não inseriu (mesmo sem intenção) seus próprios preconceitos no material.
+
+Para atingir essas metas, a transcrição detalha quatro técnicas práticas de intervenção nos dados:
+1. **Revisar e Refinar o Pipeline de Coleta de Dados**  
+A forma como você "filtra" os dados que entram no seu sistema dita o viés que o modelo terá.
+  - **Ação:** Analise cuidadosamente os filtros de inclusão e exclusão do seu pipeline. Todo filtro influencia o dado de alguma forma.
+  - **Boas Práticas e Ferramentas:** Use referências de mercado para garantir diversidade desde a captação. Exemplo: Ao coletar fotos de rostos humanos, pode-se usar a Escala Monk Skin Tone (MST) (desenvolvida em parceria com o Google), que define 10 formatos de tons de pele, garantindo que o banco de imagens represente adequadamente a diversidade global.
+  - **Limitação:** Para características mais abstratas ou sensíveis, podem não existir "réguas de medição" (como a Escala MST) prontas no mercado.
+2. **Balanceamento por Reamostragem (Resampling)**  
+Se os dados já existem, mas estão desequilibrados, você pode alterar as proporções estatísticas do conjunto.
+  - **Ação (Downsampling / Upsampling):** Reduzir os exemplos do grupo majoritário ou multiplicar os exemplos do grupo minoritário. Exemplo Prático: Se um banco de dados de comissários de bordo possui 90% de mulheres e 10% de homens, você reduz a amostragem feminina ou aumenta a masculina para equilibrar.
+  - **Vantagem:** É uma técnica rápida e barata, pois não exige a coleta externa de novos dados.
+  - **Limitação e Riscos:** Se você multiplicar muito os poucos dados do grupo minoritário, o modelo pode sofrer overfitting (decorar aqueles poucos exemplos em vez de aprender o conceito). Além disso, essa super amplificação pode acabar criando estereótipos acidentais.
+3. **Fazer Melhorias com Mais Dados (Ampliação do Pool)**  
+Quando a reamostragem não é suficiente, a solução é "injetar" dados externos no seu conjunto original. Existem três formas de fazer isso:
+  - **Bancos Externos:** Adicionar conjuntos de dados já existentes no mercado para preencher as lacunas do seu grupo sub-representado.
+  - **Dados Sintéticos:** Usar inteligência artificial ou simuladores para gerar dados artificiais (ex: criar imagens de rostos diversos por computador). Atenção ao Risco: É vital monitorar se o modelo está tratando imagens sintéticas da mesma forma que imagens reais, para não corromper o treinamento.
+  - **Nova Coleta (Manual):** Ir a campo e coletar dados inéditos e reais de subgrupos que faltam.
+  - **Vantagem Geral:** Permite aumentar as minorias sem precisar "deletar" os dados da maioria. Dados sintéticos, especificamente, são muito mais baratos do que coletar dados no mundo real.
+  - **A Grande Limitação:** A coleta de dados inéditos no mundo real é, de longe, o processo mais caro e demorado de todo o ciclo de Machine Learning.
+4. **Rotular os Dados Outra Vez (Relabeling)**  
+Os dados podem estar bem distribuídos, mas os rótulos (as tags que dizem ao modelo o que aquele dado significa) podem estar contaminados. 
+  - **Ação:** Revisar o banco de dados inteiro para remover rótulos prejudiciais, atualizar a classificação para os padrões éticos atuais e adicionar anotações que foram esquecidas no passado.
+  - **Exemplo Prático (Análise de Sentimento):** Imagine um modelo treinado para classificar resenhas de filmes. Se o banco de dados original classificou textos com frases estereotipadas como "resenhas normais", o modelo aprenderá o preconceito. A solução é colocar especialistas humanos para revisar essas avaliações e mudar os rótulos para tons neutros, ensinando a máquina a focar no "conteúdo real do filme", e não na linguagem enviesada.
+  - **Limitação:** Mudar o nome do rótulo não resolve o problema de falta de dados (viés de amostragem). Se há poucos exemplos de um grupo, eles continuarão sendo poucos, mesmo que agora estejam rotulados corretamente.
