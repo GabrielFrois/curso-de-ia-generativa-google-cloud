@@ -38,4 +38,42 @@ Com o ambiente em nuvem pronto, a fase de programação em si se inicia através
 
 ---
 
-## Laboratório 2: 
+## Laboratório 2: Implantação de Modelo de Classificação de Imagens com Vertex Explainable AI
+
+### Visão Geral e Propósito do Laboratório
+
+Este laboratório prático de nível intermediário foca na aplicação real de técnicas de Inteligência Artificial Explicável (XAI) no ecossistema do Google Cloud.
+
+O objetivo central vai além de simplesmente criar uma IA que reconhece imagens: o laboratório ensina como disponibilizar esse modelo em produção e fazer com que ele justifique visualmente suas decisões para os usuários, utilizando a ferramenta Vertex Explainable AI.
+
+### Objetivos de Aprendizagem (O Que Será Feito)
+
+Durante o exercício, o aluno passará por todo o ciclo de vida de um modelo de visão computacional (treinamento, implantação e auditoria), com as seguintes metas práticas:
+- **Construção e Treinamento:** Criar e treinar um modelo personalizado de classificação de imagens usando o Vertex AI.
+- **Implantação (Deploy):** Colocar esse modelo treinado em produção (em um Endpoint ativo), permitindo que ele receba novos dados e faça previsões no mundo real.
+- **Geração de Previsões Explicáveis:** Configurar o endpoint não apenas para dizer "o que" está na imagem, mas para retornar os metadados de explicação da decisão.
+- **Visualização de Atribuição de Atributos:** Usar a técnica de Gradientes Integrados (IG)  para renderizar um "mapa de calor" visual sobre a foto, destacando exatamente quais pixels o modelo considerou mais importantes para chegar à sua conclusão.
+
+### Fluxo de Trabalho e Execução Prática
+
+O laboratório é estruturado em três fases principais de execução na nuvem:
+
+### Fase 1: Preparação da Infraestrutura e APIs
+Como o treinamento e a implantação de modelos de imagem exigem processamento em nuvem, a primeira etapa é preparar o ambiente isolado:
+- **Acesso Seguro:** O login no Console do Google Cloud é feito via janela anônima com credenciais temporárias do laboratório (para evitar problemas com contas pessoais).
+- **Ativação de Serviços:** O aluno deve habilitar a API Vertex AI (o coração de todo o processo de Machine Learning do Google Cloud) e a API Notebooks para permitir a criação do ambiente de programação.
+
+### Fase 2: Criação do Ambiente de Desenvolvimento (Vertex AI Workbench)
+O código será executado em uma máquina virtual (VM) dedicada ao cientista de dados.
+- **Instanciamento:** O aluno cria uma nova instância de Notebook no Vertex AI Workbench, mantendo as configurações de região padrão fornecidas pelo laboratório.
+- **Acesso à Interface:** Após a inicialização da VM (que leva alguns minutos), o desenvolvedor acessa o ambiente abrindo uma aba do JupyterLab.
+
+### Fase 3: Execução do Código e Geração de Explicações
+Com o JupyterLab aberto, a fase de engenharia e modelagem entra em ação pelo terminal e pelo notebook:
+- **Clonagem do Repositório:** O usuário utiliza comandos de terminal (como git clone e make install) para baixar os arquivos oficiais do curso (asl-ml-immersion) e instalar as dependências necessárias do Python.
+- **Configuração do Notebook:** O aluno navega até o arquivo específico da solução (xai_image_vertex.ipynb na pasta de IA Explicável). É necessário garantir que o Kernel selecionado seja o Python 3 e limpar todas as saídas de código pré-existentes (Editar > Limpar todas as saídas) para que o teste seja feito do zero.
+- **Treinamento e Implantação:** O aluno executa o notebook célula a célula (usando SHIFT+ENTER). O código guiará o usuário pelo processo de treinar o classificador de imagens no TensorFlow, fazer o deploy no Vertex AI, e, finalmente, chamar a API de explicação para renderizar os Gradientes Integrados diretamente sobre as imagens de teste.
+
+---
+
+## Laboratório 3: 
