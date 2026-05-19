@@ -123,4 +123,50 @@ Esta é a fase onde a engenharia de privacidade acontece na prática.
 
 ---
 
-## Laboratório 4:
+## Laboratório 4: Proteção com a API Gemini da Vertex AI
+
+### Visão Geral do Laboratório
+Este laboratório de nível intermediário complementa a teoria do módulo anterior, colocando em prática a configuração das salvaguardas de segurança integradas do Google Cloud. 
+O experimento demonstra como os desenvolvedores podem interagir programaticamente com o Gemini para auditar e controlar o nível de toxicidade das respostas geradas pela IA.
+
+### Objetivos Essenciais de Aprendizagem:
+Ao final deste laboratório, o desenvolvedor saberá como:
+- **Inspecionar Classificações:** Chamar a API Gemini através da Vertex AI e extrair/inspecionar as classificações de segurança (safety ratings) e as probabilidades de risco que o modelo anexa a cada resposta.
+- **Configurar Limites Personalizados:** Definir e ajustar os limites de segurança (thresholds) via código para filtrar ativamente as respostas da IA de acordo com as necessidades estritas de segurança do seu caso de uso.
+
+### Passo a Passo da Execução
+O experimento é estruturado em quatro fases principais, partindo da preparação da infraestrutura em nuvem até a execução dos scripts em Python.
+
+#### Fase 1: Configuração e Requisitos (Tarefa 0)
+Antes de acessar o modelo, é preciso preparar o ambiente base do Google Cloud.
+- Acesso Limpo: O laboratório deve ser iniciado em uma janela anônima para evitar que credenciais pessoais entrem em conflito com a conta temporária (Google Skills) fornecida para o exercício.
+- Liberação de APIs: No Console do Google Cloud, o desenvolvedor precisa ativar os serviços fundamentais para a execução do experimento:
+  - API Notebooks (através da Biblioteca de APIs).
+  - Acessar o painel da Vertex AI e clicar em "Ativar todas as APIs recomendadas".
+
+#### Fase 2: Provisionamento do Ambiente de Desenvolvimento (Tarefa 1)
+Todo o código será executado em uma máquina virtual (VM) pré-configurada para cargas de trabalho de Inteligência Artificial.
+- **Criação da Instância:** Acessando Vertex AI > Workbench, cria-se uma nova instância de desenvolvimento, mantendo as configurações de região e zona padrão fornecidas.
+- **Acesso ao JupyterLab:** Após a VM ser provisionada (o que leva de 2 a 3 minutos), o desenvolvedor abre a interface do JupyterLab em uma nova guia, que servirá como a IDE (Ambiente de Desenvolvimento Integrado) do laboratório.
+
+#### Fase 3: Importação do Repositório de Código (Tarefa 2)
+Para executar o laboratório, o desenvolvedor precisa trazer os arquivos do curso para dentro da sua instância do JupyterLab.
+- **Clonagem via Terminal:** Abre-se o terminal integrado e executam-se os comandos de clonagem do repositório oficial do Google Cloud:
+```Bash
+git clone https://github.com/GoogleCloudPlatform/asl-ml-immersion.git
+cd asl-ml-immersion
+export PATH=$PATH:~/.local/bin
+make install
+```
+- **Validação:** O desenvolvedor confirma a importação verificando se a pasta asl-ml-immersion (que contém todos os notebooks do curso) foi criada corretamente na interface de arquivos.
+
+#### Fase 4: Proteção com a API Gemini na Prática (Tarefa 3)
+Nesta etapa final, o desenvolvedor aplica os conceitos de segurança manipulando a API diretamente no código.
+- **Navegação:** O desenvolvedor acessa o diretório asl-ml-immersion > notebooks > responsible_ai > safety > solutions e abre o arquivo interativo gemini_safety_ratings.ipynb.
+- **Configuração do Kernel:** Caso o sistema solicite, confirma-se o uso do Kernel Python 3.
+- **Higienização:** Clica-se em Editar > Limpar saídas de todas as células. Essa prática garante que os resultados exibidos na tela sejam fruto da execução atual do desenvolvedor, e não um resquício do arquivo original.
+- **Execução e Análise:** O desenvolvedor executa o notebook célula por célula (SHIFT+ENTER). Durante a execução, ele enviará prompts ao Gemini e analisará o feedback de segurança retornado (Irrelevante, Baixo, Médio, Alto) para as categorias de Assédio, Discurso de Ódio, Conteúdo Perigoso e Sexualmente Explícito, ajustando os bloqueios na prática.
+
+---
+
+## Laboratório 5:
