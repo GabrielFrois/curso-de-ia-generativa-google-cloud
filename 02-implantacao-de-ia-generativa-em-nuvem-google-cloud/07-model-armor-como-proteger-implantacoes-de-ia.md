@@ -268,4 +268,27 @@ Validar bloqueios de comandos maliciosos, detecção de links perigosos e mascar
 
 ---
 
-##
+## Código do aplicativo
+
+### A Passagem do Bastão
+O Model Armor atua como o sistema de inspeção da sua infraestrutura. Ele utiliza as configurações mínimas e os modelos predefinidos para identificar ameaças, agentes maliciosos e dados sensíveis. 
+No entanto, o ciclo de segurança não termina aí. Após a detecção, o Model Armor "passa o bastão" para o desenvolvedor. Cabe ao engenheiro de software escrever o código do aplicativo para interpretar esses resultados e decidir qual ação mitigatória deve ser tomada.
+
+### O Plano de Ação em 3 Etapas
+Para gerenciar o fluxo de segurança utilizando a API REST do Model Armor, o código do seu aplicativo deve seguir um roteiro lógico de três passos:
+1. Fazer a chamada: O aplicativo aciona o serviço do Model Armor, submetendo os comandos inseridos pelo usuário (entradas) ou as respostas geradas pelo LLM (saídas) para verificação.
+2. Ler as respostas: O aplicativo recebe e processa o diagnóstico (o payload de resposta) retornado pelo Model Armor.
+3. Decidir o que fazer: Com base no status retornado (se uma ameaça foi detectada ou não), o código deve aplicar uma lógica de negócios para intervir. As opções de ação incluem:
+  - Bloquear a solicitação do usuário antes que ela chegue à IA.
+  - Bloquear a exibição da resposta gerada pelo modelo.
+  - Emitir um aviso de segurança para o usuário.
+  - Substituir as informações sensíveis pelo texto editado (desidentificado) fornecido pelo Model Armor e continuar o fluxo normal de trabalho.
+
+### Análise Prática: O Exemplo em Python
+O texto fornece um script simplificado em Python que ilustra exatamente como essas três etapas são implementadas na arquitetura do software. Abaixo está a quebra do funcionamento do código:
+- Configuração Inicial: O código começa importando a biblioteca necessária (google-cloud-modelarmor) e instanciando o cliente de comunicação via REST, apontando para o endpoint correto do Google Cloud.
+- Captura e Preparação da Entrada (Etapa 1): O aplicativo captura o comando (prompt) diretamente da linha de comando do terminal. Em seguida, ele empacota esse texto em um objeto de requisição (SanitizeUserPromptRequest), indicando o caminho exato do projeto e do modelo de segurança que fará a avaliação.
+- A Chamada à API (Etapa 2): O método client.sanitize_user_prompt é acionado para enviar o comando ao Model Armor. O resultado da análise é armazenado na variável ma_response.
+- Lógica de Decisão (Etapa 3): O código inspeciona a resposta focando em um filtro específico (no caso, Injeção de Comando e Jailbreak, representado por pi_and_jailbreak).
+  - Se a infração for confirmada: O sistema detecta a bandeira MATCH_FOUND. O aplicativo assume o controle, emite uma mensagem de erro ("Query failed security check. Error.") e bloqueia o fluxo.
+  - Se estiver seguro: Caso nenhuma infração seja encontrada, o aplicativo libera a passagem e prossegue enviando o comando higienizado para o LLM.
