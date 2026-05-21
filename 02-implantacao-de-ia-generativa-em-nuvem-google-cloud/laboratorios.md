@@ -169,4 +169,46 @@ Nesta etapa final, o desenvolvedor aplica os conceitos de segurança manipulando
 
 ---
 
-## Laboratório 5:
+## Laboratório 5: Limpar Comandos e Respostas com o Model Armor
+
+### Model Armor no Google Cloud
+O laboratório prático de nível avançado (GSP1327) foca na implementação de medidas de segurança em Inteligência Artificial utilizando o Model Armor no Google Cloud Platform (GCP).
+
+O serviço atua como um filtro centralizado que inspeciona o tráfego bidirecional de sistemas de IA (comandos de entrada e respostas de LLMs). 
+A principal função é garantir a conformidade e a segurança, mitigando riscos como a geração de conteúdo nocivo, injeções de comandos e a exposição de dados sensíveis. 
+Além disso, o serviço integra-se ao Security Command Center, proporcionando uma visão unificada sobre possíveis manipulações dos modelos de IA.
+
+### Objetivos Principais
+O roteiro do experimento foi desenhado para capacitar a execução das seguintes ações essenciais:
+- Ativação da API correspondente ao serviço.
+- Criação e configuração de um modelo (template) de segurança.
+- Testes práticos de higienização e validação de comandos contra diferentes vetores de ameaças.
+
+### Preparação Inicial
+A recomendação padrão exige a execução do ambiente em uma janela anônima do navegador. São fornecidas credenciais temporárias exclusivas para o acesso ao console do Google Cloud, evitando o uso de contas pessoais que possam gerar cobranças indevidas.
+
+### Tarefa 1: Ativação da API Model Armor
+A primeira ação técnica exige a inicialização do Cloud Shell no console do Google Cloud. Em seguida, executa-se um comando para habilitar a API fundamental do serviço (`modelarmor.googleapis.com`) dentro do projeto provisionado para o laboratório.
+
+### Tarefa 2: Acesso ao Vertex AI Workbench
+O ambiente de desenvolvimento integrado escolhido para os testes é o JupyterLab. Para acessá-lo, navega-se até a seção "Agent Platform > Notebooks > Workbench" no painel do console. 
+Ao localizar a instância pré-configurada, a interface do JupyterLab é inicializada em uma nova guia.
+
+### Tarefa 3: Configuração do Notebook
+Dentro do JupyterLab, o arquivo do notebook designado deve ser aberto. A configuração inicial requer:
+- A seleção do Kernel Python 3.
+- A execução das células introdutórias para importar as bibliotecas necessárias.
+- A definição das variáveis de ambiente com os dados do laboratório (ID do projeto e a Região de implantação).
+
+### Tarefa 4: Criação do Modelo (Template) de Segurança
+Acessando a seção de criação no código, estabelece-se o modelo nomeado como `ma-template`. 
+Esta etapa define as regras operacionais do Model Armor, estabelecendo as políticas de filtragem de conteúdo para detectar e reduzir a exposição de dados sensíveis, em conformidade com as diretrizes de proteção.
+
+### Tarefa 5: Validação e Testes de Higienização
+A fase final consolida o aprendizado através da execução de testes diretos no notebook. 
+O objetivo é submeter a infraestrutura a diversos cenários de ameaça, avaliando como o filtro interage com os InfoTypes predefinidos da Proteção de Dados Sensíveis (SDP). As validações abrangem:
+- Filtro de IA Responsável: Submissão de um comando para testar a contenção de conteúdo ofensivo ou inadequado.
+- Bloqueio de URI Maliciosa: Inserção de um link mal-intencionado no comando para verificar a detecção e o bloqueio automático de potenciais ataques de phishing.
+- DLP na Entrada (Comando): Teste de Prevenção contra Perda de Dados analisando um comando inserido pelo usuário que tenta expor informações sigilosas.
+- DLP na Saída (Resposta): Teste focado em inspecionar uma resposta simulada gerada pela IA, visando barrar vazamentos de dados originados pelo próprio modelo.
+- Análise de Arquivos: Execução de um comando focado em higienizar um arquivo fornecido pelo usuário, comprovando que o serviço inspeciona formatos de documentos, e não apenas textos simples inseridos via chat.
