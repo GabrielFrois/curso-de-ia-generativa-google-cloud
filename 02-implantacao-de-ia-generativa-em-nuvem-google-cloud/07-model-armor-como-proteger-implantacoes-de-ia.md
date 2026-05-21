@@ -172,4 +172,100 @@ Regra de Hierarquia: É fundamental destacar que o nível de confiança configur
 
 ---
 
-## Sobre a configuração
+## Configuração da API
+
+### Pré-requisitos e Ferramentas
+Para iniciar o trabalho com a API do Model Armor de forma estruturada e ágil, é necessário preparar o ambiente de desenvolvimento. O processo de configuração é direto e baseia-se em cinco pilares fundamentais de acesso e documentação:
+
+#### 1. Permissões de Acesso
+Antes de qualquer integração, é indispensável verificar e garantir que os papéis de segurança e permissões corretas estejam atribuídos à conta que realizará as chamadas à API.
+
+#### 2. CLI do Google Cloud
+A comunicação inicial requer a autenticação da ferramenta de linha de comando (CLI) do Google Cloud no console da plataforma. Além disso, é obrigatório definir o ID do projeto, informação que pode ser facilmente localizada no bloco "Informações do projeto" no painel principal.
+
+#### 3. Bibliotecas de Cliente
+O desenvolvimento eficiente depende do acesso às bibliotecas de cliente do Cloud específicas para a API Model Armor. O uso desses pacotes facilita e padroniza a comunicação com os serviços do Google Cloud através das linguagens de programação suportadas pelo sistema.
+
+#### 4. Suporte para Python
+Caso o ambiente de desenvolvimento ou o aplicativo base utilize Python, existe um roteiro técnico focado exclusivamente na configuração desta linguagem, detalhando os passos exatos para instanciar a comunicação.
+
+#### 5. Guia de Referência da API
+Para o mapeamento estrutural durante o desenvolvimento de software, é necessário consultar o repositório central que detalha todas as operações, endpoints e métodos de API aceitos pelo Model Armor.
+
+---
+
+## Violações sinalizadas
+
+### Auditoria e Rastreabilidade
+O Model Armor atua não apenas na filtragem de textos de entrada e saída dos Grandes Modelos de Linguagem (LLMs), mas também na documentação contínua de todas as operações. 
+Essas observações são consolidadas em formato de registros (logs), permitindo a auditoria completa de quem acessou o sistema e quais violações foram barradas.
+
+Os registros são ativados via API e dividem-se em duas categorias principais:
+1. **Registros de Auditoria de Atividade do Administrador:** Capturam todos os detalhes operacionais de infraestrutura. Eles documentam ações de computação básica (operações CRUD), como a criação e atualização de modelos, e as definições de configurações mínimas.
+2. **Registros de Auditoria de Acesso aos Dados:** Focados na operação da inteligência artificial. Eles documentam o processo de filtragem de fato, registrando qual modelo foi utilizado para analisar um determinado comando ou resposta, qual era o conteúdo do texto e qual foi o resultado da verificação.
+
+### Análise e Filtragem de Registros
+Devido ao alto volume de informações geradas, a ferramenta Análise de Registros (acessada via menu de Monitoramento no console do Google Cloud) é utilizada para isolar dados específicos. A segmentação ocorre através de filtros de busca:
+- Filtro de Gerenciamento: `protoPayload.serviceName="modelarmor.googleapis.com"`
+Utilizado para exibir apenas os registros de auditoria focados nas ações estruturais do modelo (como eventos de criação ou atualização).
+- Filtro de Filtragem de Texto: `protoPayload.methodName="google.cloud.modelarmor.v1.ModelArmor.SanitizeUserPrompt"`
+Utilizado para isolar os registros de acesso a dados, mostrando especificamente os momentos em que o sistema examinou e filtrou comandos e respostas.
+
+### Estrutura dos Registros e Indicadores de Violação
+A análise do corpo dos arquivos de registro (formato JSON) revela parâmetros essenciais para a investigação de incidentes.
+
+#### 1. Estrutura do Registro de Atividade do Administrador
+Quando uma ação de infraestrutura ocorre (como a criação de um novo modelo), o registro captura metadados fundamentais:
+  - `principalEmail`: Identifica a conta (e-mail) responsável por iniciar a ação.
+  - `methodName`: Aponta o método exato da API que foi executado (exemplo: `CreateTemplate`).
+  - `templateID`: Informa o identificador exclusivo do modelo que sofreu a ação.
+O restante do arquivo detalha as configurações exatas que foram aplicadas a esse modelo.
+
+#### 2. Estrutura do Registro de Acesso aos Dados (Detecção de Ameaças)
+Para identificar se uma ameaça real foi contida ao analisar um comando, deve-se monitorar o parâmetro `matchState`. Quando o sistema exibe o status `MATCH_FOUND`, confirma-se que uma violação foi descoberta e bloqueada.
+
+Os registros detalham diferentes tipos de violações:
+- **Violações de IA Responsável (RAI):** Quando conteúdo ofensivo é detectado, o sistema registra a infração (ex: discurso de ódio ou linguagem explícita), incluindo o nível de confiança que foi aplicado na configuração e a confirmação do achado (`MATCH_FOUND`).
+- **Violações por Injeção de Comando e Jailbreak:** O registro documenta eventos em que invasores tentaram manipular estruturalmente as instruções do modelo para burlar regras de segurança, sinalizando o sucesso da execução da defesa e a identificação da correspondência maliciosa.
+
+---
+
+## Comandos e respostas
+
+### Validação do Modelo de Proteção
+Após a criação e configuração de um modelo (template) no Model Armor, a etapa mais crítica do processo de implantação de uma Inteligência Artificial segura é a validação prática. 
+A compreensão da eficácia do sistema exige a realização de simulações e testes para garantir que as barreiras de proteção funcionem corretamente no mundo real.
+
+A demonstração utiliza o ambiente do Vertex AI Workbench com um notebook Jupyter para executar os testes. 
+Através de comandos curl, simula-se o envio de requisições de entrada (comandos de usuários) e de saída (respostas geradas pela IA) para verificar o comportamento do filtro de segurança.
+
+### Execução das Simulações de Segurança
+A validação do sistema abrange diferentes categorias de ameaças, garantindo que o Model Armor atue de forma bidirecional. A demonstração foca em cinco cenários principais de teste:
+
+#### 1. Teste de IA Responsável (Conteúdo Ofensivo)
+  - **A Simulação:** Um comando de teste intencionalmente inapropriado e abusivo é enviado ao sistema.
+  - **O Resultado:** O Model Armor intercepta a entrada com sucesso, acusando uma correspondência encontrada com alta confiança no filtro da categoria de assédio, bloqueando o conteúdo antes que ele interaja com o modelo de IA.
+
+#### 2. Teste de Detecção de URI Maliciosa
+  - **A Simulação:** Um comando contendo um link falso, estruturado como uma tentativa de phishing, é submetido à análise.
+  - **O Resultado:** O sistema identifica o risco instantaneamente, retornando a informação de que uma URI maliciosa foi encontrada e bloqueando o endereço perigoso.
+
+#### 3. Teste de Proteção de Dados Sensíveis (Na Entrada)
+  - **A Simulação:** Um comando de usuário contendo informações sigilosas — neste caso, um Número de Previdência Social dos EUA fictício — é enviado para o sistema.
+  - **O Resultado:** O filtro acusa a correspondência para um número altamente provável de Previdência Social. O teste destaca que é possível configurar regras de desidentificação (masking) para ocultar automaticamente esses dígitos.
+
+#### 4. Teste de Proteção de Dados Sensíveis (Na Saída da IA)
+  - **A Simulação:** Para avaliar se o sistema protege os dados quando a própria IA comete um erro, submete-se uma resposta simulada do modelo contendo um número de cartão de crédito fictício.
+  - **O Resultado:** O Model Armor examina a saída e sinaliza a correspondência de um cartão de crédito. Isso comprova que a ferramenta impede a exposição de dados gerados acidentalmente pelo modelo. A mesma técnica de desidentificação (ocultação de dígitos) pode ser aplicada nesta etapa.
+
+#### 5. Teste de Análise de Arquivos (PDFs)
+  - **A Simulação:** Demonstra-se a capacidade do sistema de ir além do texto simples. O conteúdo de um arquivo PDF é enviado como entrada.
+  - **O Resultado:** O Model Armor processa e verifica comandos contidos dentro de documentos, garantindo que arquivos anexados não sirvam como vetores de ameaças ocultas.
+
+### Conclusão do Processo
+A execução de testes simulados que envolvem a inserção intencional de material nocivo é uma etapa fundamental em qualquer arquitetura de IA. 
+Validar bloqueios de comandos maliciosos, detecção de links perigosos e mascaramento de dados sensíveis na entrada e na saída garante que as configurações teóricas do Model Armor se traduzam em uma proteção operacional efetiva.
+
+---
+
+##
