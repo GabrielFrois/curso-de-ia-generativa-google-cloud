@@ -292,3 +292,160 @@ Análise de Mídia: Para monitorar citações de marcas ou personalidades em not
 
 ## Laboratório 7 - API Speech-to-Text: Qwik Start
 
+Visão Geral do Laboratório
+O GSP119 é um laboratório prático introdutório que demonstra como integrar os modelos avançados de inteligência artificial e aprendizado de máquina do Google para o reconhecimento de voz em aplicações de terceiros. A API Cloud Speech-to-Text permite que desenvolvedores enviem arquivos de áudio ou fluxos de voz em tempo real e recebam de volta uma transcrição de texto precisa em mais de 125 idiomas.
+
+O objetivo central deste exercício é aprender a realizar a autenticação segura do serviço usando uma chave de API restrita e efetuar uma chamada de transcrição síncrona baseada em um arquivo de áudio hospedado no Cloud Storage, consumindo o serviço por meio de requisições HTTP REST clássicas (via curl).
+
+Etapas Principais
+1. Preparação do Ambiente e Segurança (Chave de API)
+Diferente de outros laboratórios que utilizam contas de serviço estruturadas do IAM, este foca no uso de chaves de API para requisições diretas via cliente HTTP:
+
+Geração da Chave: Criação de uma credencial do tipo Chave de API (API Key) no painel de APIs e Serviços.
+
+Princípio do Menor Privilégio: Aplicação de restrições na chave para que ela funcione exclusivamente com a API Cloud Speech-to-Text, impedindo o uso indevido em outros serviços.
+
+Variável de Ambiente: Acesso à máquina virtual Linux provisionada (linux-instance) via SSH para exportar a chave em uma variável local (export API_KEY=...), mascarando o segredo durante as chamadas.
+
+2. Estruturação da Requisição JSON
+Montagem do payload (corpo da mensagem) que dita as regras de negócio para os servidores de IA do Google:
+
+Objeto config: Declaração de parâmetros essenciais de processamento. Informa o tipo de codificação do arquivo ("encoding": "FLAC") e a variante de idioma nativa do áudio ("languageCode": "en-US").
+
+Objeto audio: Apontamento direto do recurso de mídia utilizando a URI nativa de um bucket do Cloud Storage (gs://cloud-samples-tests/speech/brooklyn.flac).
+
+3. Execução da Chamada REST e Análise de Resultados
+Submissão do pipeline de IA através de uma requisição POST com a ferramenta curl:
+
+Transmissão: Envio do arquivo request.json com os dados binários para o endpoint do método síncrono da API (v1/speech:recognize).
+
+Análise do Retorno (Response): A API processa o áudio e devolve um JSON com duas métricas cruciais de Machine Learning:
+
+transcript: O texto bruto convertido e interpretado pela IA ("how old is the Brooklyn Bridge").
+
+confidence: Um valor estatístico decimal (ex: 0.93) que representa o grau de certeza matemática do modelo em relação à exatidão da transcrição.
+
+Conceitos Chave Aprendidos
+Reconhecimento Síncrono vs. Assíncrono: O laboratório introduz o método síncrono (recognize), ideal para arquivos de áudio curtos (menos de 1 minuto) e respostas imediatas.
+
+Consumo de Modelos Pré-treinados: Como usufruir de inteligência artificial de ponta sem a necessidade de coletar dados de voz, treinar redes neurais ou gerenciar servidores de GPU.
+
+Formatação e Codificação: A importância de fornecer metadados técnicos corretos (como o codec FLAC) para que os algoritmos de PLN processem as frequências sonoras perfeitamente.
+
+Casos de Uso na Indústria
+O ecossistema explorado neste laboratório serve de fundação para o desenvolvimento de:
+
+Sistemas de legenda automatizada para vídeos em tempo real.
+
+Transcrição e auditoria de chamadas em centrais de atendimento (Call Centers).
+
+Comandos de voz para assistentes virtuais e automação residencial.
+
+---
+
+## Laboratório 8 - Video Intelligence: Qwik Start
+
+Visão Geral do Laboratório
+O GSP154 é um laboratório prático de nível introdutório focado no uso da API Cloud Video Intelligence. Essa API permite que desenvolvedores extraiam metadados avançados de arquivos de vídeo de forma assíncrona usando modelos de machine learning pré-treinados do Google, sem a necessidade de criar ou treinar redes neurais do zero.
+
+O objetivo central deste exercício é aprender a configurar a autenticação por meio de uma conta de serviço dedicada e submeter um vídeo público hospedado no Cloud Storage (gs://...) para o recurso de Detecção de Rótulos (Label Detection). Ao final, o aluno compreende como interpretar a resposta JSON da API para identificar quais objetos ou entidades (substantivos) aparecem no vídeo e o tempo exato de suas aparições.
+
+Etapas Principais
+1. Configuração e Autorização (IAM)
+Antes de fazer chamadas à API, o laboratório estabelece o contexto de segurança no Cloud Shell:
+
+Criação da Service Account: É gerada uma conta de serviço personalizada chamada quickstart.
+
+Geração da Chave JSON: É exportada uma chave de autenticação privada (key.json) atrelada a essa conta.
+
+Ativação e Token: A conta de serviço é ativada no ambiente do terminal (gcloud auth activate-service-account), e é gerado um token de acesso temporário (gcloud auth print-access-token) que será injetado no cabeçalho das requisições HTTP (Authorization: Bearer).
+
+2. Criação da Solicitação de Anotação (Payload JSON)
+Montagem do arquivo de configuração request.json que define o escopo do processamento:
+
+inputUri: Aponta para o arquivo de mídia bruta no Cloud Storage (gs://spls/gsp154/video/train.mp4, um vídeo curto de um trem).
+
+features: Define quais inteligências serão aplicadas ao vídeo. Neste caso, utiliza-se a LABEL_DETECTION (detecção de rótulos/objetos).
+
+3. Execução Assíncrona e Monitoramento da Operação
+Como o processamento de vídeos exige alto poder computacional e tempo, a API Video Intelligence trabalha com operações assíncronas:
+
+Primeiro Envio: O comando curl faz um POST para o endpoint videos:annotate. A API não devolve o resultado imediatamente; ela responde com um ID de Operação (ex: projects/.../operations/...).
+
+Checagem de Status (Polling): O usuário executa um segundo comando curl apontando para o endpoint da operação específica para checar o progresso. Inicialmente, o JSON de resposta mostra o percentual de progresso.
+
+Resultado Final: Quando o processamento atinge 100%, a flag "done": true é retornada, revelando o bloco annotationResults.
+
+Conceitos Chave Aprendidos
+Operações Assíncronas: Padrão arquitetural essencial para serviços de IA que lidam com arquivos pesados (vídeos/áudios longos), onde a requisição retorna um "recibo" (ID da operação) para que o cliente consulte o status depois.
+
+Detecção de Rótulos (Label Detection): Capacidade da IA de assistir ao vídeo quadro a quadro, reconhecer objetos (como um trem ou trilhos), associar um ID de entidade global (entityId) e calcular a precisão matemática (confidence) daquela detecção.
+
+Offsets de Tempo (startTimeOffset / endTimeOffset): Segmentação temporal que diz exatamente em qual segundo o objeto entra e sai da cena.
+
+Casos de Uso na Indústria
+O ecossistema explorado neste laboratório serve de fundação para soluções reais como:
+
+Sistemas de Busca de Mídia: Motores de busca internos para plataformas de streaming (ex: encontrar todas as cenas de um catálogo onde aparece um "carro").
+
+Moderação de Conteúdo: Varredura automática de vídeos enviados por usuários para detectar conteúdos explícitos ou logotipos protegidos por direitos autorais.
+
+Geração de Tags para SEO: Criação automática de palavras-chave baseadas no conteúdo visual do vídeo para melhorar a indexação na web.
+
+---
+
+## Laboratório 9 - Preparação de dados para APIs de ML no Google Cloud
+
+Visão Geral do Laboratório
+Os Laboratórios com Desafio (Challenge Labs) são avaliações práticas projetadas para consolidar e validar as habilidades adquiridas ao longo de uma trilha de aprendizado — neste caso, o selo de engenharia de dados e machine learning. Diferente dos laboratórios tradicionais, o GSP323 não fornece instruções passo a passo ou comandos para copiar e colar. Em vez disso, ele apresenta um cenário de negócios real na empresa fictícia Jooli Inc., onde você deve configurar de forma autônoma pipelines de dados (em lote e distribuídos) e consumir APIs de Inteligência Artificial, provando sua capacidade de arquitetar soluções integradas no Google Cloud.
+
+Detalhamento das Tarefas do Desafio
+Tarefa 1: Ingestão de Dados em Lote com Dataflow
+O objetivo é criar um pipeline ETL (Extração, Transformação e Carregamento) sem servidor para mover dados brutos do Cloud Storage para o BigQuery.
+
+Preparação Obrigatória: Antes de rodar o pipeline, você deve criar manualmente a estrutura de destino: um Dataset no BigQuery e um Bucket no Cloud Storage.
+
+O Pipeline: Utiliza-se o modelo nativo do Dataflow (Cloud Storage Text Files to BigQuery).
+
+Transformação (UDF): O job aplica uma função JavaScript definida pelo usuário (UDF) hospedada em gs://spls/gsp323/lab.js para transformar os dados antes de salvá-los.
+
+Infraestrutura: É necessário desmarcar o padrão e fixar as instâncias como e2-standard-2 para controlar o custo e escopo do processamento.
+
+Tarefa 2: Processamento Distribuído com Managed Service for Spark (Dataproc)
+Validação de habilidades na orquestração de algoritmos complexos de Big Data em clusters gerenciados.
+
+Preparação no HDFS: Antes do envio do job, você deve se conectar via SSH a um nó do cluster e usar comandos de terminal para copiar o arquivo do Cloud Storage diretamente para o sistema de arquivos nativo do Hadoop (hdfs dfs -cp gs://... /data.txt).
+
+Configuração do Cluster: O cluster deve ser instanciado usando a série de máquinas E2 (e2-standard-2) com discos permanentes equilibrados de 100 GB e a rede configurada para permitir IPs externos (desmarcar apenas IP interno).
+
+O Job: Submissão de um job do tipo Spark executando o algoritmo SparkPageRank, passando o arquivo do HDFS como argumento.
+
+Tarefa 3: Análise de Áudio com a API Cloud Speech-to-Text
+Conversão de voz em texto utilizando os modelos de Deep Learning do Google.
+
+Execução: Processar de forma síncrona ou assíncrona o arquivo de áudio brooklyn.flac (ou o especificado task3.flac).
+
+Entrega do Artefato: O JSON resultante da transcrição deve ser salvo e enviado para o bucket especificado no campo Cloud Speech Location.
+
+Regra de Validação: O cabeçalho de metadados (Content-Type) do arquivo no Cloud Storage deve ser explicitamente definido como application/json, caso contrário, o validador automático falhará.
+
+Tarefa 4: Extração de Conhecimento com a API Cloud Natural Language
+Uso de Processamento de Linguagem Natural (PLN) para analisar textos não estruturados.
+
+Execução: Submeter o trecho de texto fornecido sobre a mitologia de Odin para o endpoint de análise de entidades (analyze-entities).
+
+Entrega do Artefato: Salvar a resposta JSON (contendo a classificação de pessoas, locais e objetos, bem como o índice de relevância/salience) e fazer o upload do arquivo para o caminho indicado em Cloud Natural Language Location, também aplicando o metadado application/json.
+
+Conceitos Fundamentais Consolidados
+Arquitetura de Dados Unificada: Como conectar a camada de armazenamento de arquivos brutos (Cloud Storage), processamento distribuído (Spark/Dataproc), computação sem servidor baseada em eventos (Dataflow) e armazenamento analítico (BigQuery).
+
+Segurança e IAM: A verificação inicial reforça o conceito de que contas de serviço padrão (como a do Compute Engine) precisam receber explicitamente papéis como roles/storage.admin para permitir a automação de pipelines.
+
+Consumo de IA Pronta (Pre-trained ML): Demonstração prática de que análises complexas de áudio e texto não exigem que o engenheiro de dados treine modelos, mas sim que saiba estruturar payloads JSON e tratar respostas REST de maneira eficiente.
+
+Estratégia para Obter 100% de Pontuação
+Zere a Tarefa 1 por primeiro: Garanta que o esquema da tabela do BigQuery corresponda exatamente ao arquivo .schema fornecido. Aguarde o job do Dataflow mudar para o status "Succeeded" antes de clicar no botão de progresso.
+
+Cuidado com a Sintaxe no Spark: No Dataproc, o argumento /data.txt aponta para a raiz do HDFS. Se esquecer de rodar o comando de cópia via SSH antes, o job falhará imediatamente por falta de arquivo.
+
+Metadados do Cloud Storage: Ao fazer upload dos arquivos result.json das tarefas de IA (Speech e Natural Language), use o console ou o utilitário gcloud/gsutil para garantir que o tipo do arquivo seja application/json, um detalhe técnico sutil que bloqueia muitos estudantes neste desafio.
